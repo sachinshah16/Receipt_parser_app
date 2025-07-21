@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Lighter background for Bootstrap */
+            color: #333;
+            padding: 20px;
+        }
+
+        .navbar-custom { /* Custom class for your navigation div */
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px; /* Space between buttons */
+            justify-content: center; /* Center the buttons */
+        }
+
+        .navbar-custom button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-custom button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Adjustments for the filter form */
+        .form-control, .form-select {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Styling for the Edit and Delete buttons in the table */
+        .table button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 5px; /* Space between buttons */
+        }
+
+        .table button[type="submit"] { /* Delete button */
+            background-color: #dc3545; /* Bootstrap danger color */
+            color: white;
+            border: 1px solid #dc3545;
+        }
+
+        .table button[type="submit"]:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .table a button[type="button"] { /* Edit button */
+            background-color: #ffc107; /* Bootstrap warning color */
+            color: #212529; /* Dark text for better contrast */
+            border: 1px solid #ffc107;
+        }
+
+        .table a button[type="button"]:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="navbar-custom"> <a href="{{ url_for('upload_file') }}"><button>Upload Receipt</button></a>
+        <a href="{{ url_for('receipts') }}"><button>View Receipts</button></a>
+        <a href="{{ url_for('dashboard') }}"><button>Dashboard</button></a>
+    </div>
+
+    <h2 class="mb-4">📜 Uploaded Receipts</h2>
+
+    <form class="row g-2 mb-4" method="get">
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" placeholder="Search vendor..." value="{{ request.args.get('search', '') }}">
+        </div>
+        <div class="col-md-3">
+            <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+        </div>
+        <div class="col-md-3">
+            <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="sort_by" class="form-select">
+                <option value="date" {% if request.args.get('sort_by') == 'date' %}selected{% endif %}>Sort by Date</option>
+                <option value="amount" {% if request.args.get('sort_by') == 'amount' %}selected{% endif %}>Sort by Amount</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="sort_order" class="form-select">
+                <option value="desc" {% if request.args.get('sort_order') == 'desc' %}selected{% endif %}>Descending</option>
+                <option value="asc" {% if request.args.get('sort_order') == 'asc' %}selected{% endif %}>Ascending</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Vendor</th>
+                <th>Amount (₹)</th>
+                <th>Date</th>
+                <th>Actions</th> </tr>
+        </thead>
+        <tbody>
+            {% for r in receipts %}
+            <tr>
+                <td>{{ r.vendor }}</td>
+                <td>{{ r.amount }}</td>
+                <td>{{ r.date or '-' }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('delete_receipt', id=r.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this receipt?')">Delete</button>
+                    </form>
+                    <a href="{{ url_for('edit_receipt', id=r.id) }}">
+                        <button type="button" class="btn btn-warning btn-sm">Edit</button>
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center">No receipts found.</td></tr> {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

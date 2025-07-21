@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Confirmation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f8f9fa; /* Light background consistent with other pages */
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack children vertically */
+            min-height: 100vh; /* Ensure it takes full viewport height */
+        }
+
+        /* Navbar from other templates for consistency */
+        .navbar-custom {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            background-color: #f5f5f5; /* Slight background for the navbar */
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-custom button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-custom button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Main content container for the two columns */
+        .confirmation-container { /* Renamed from .container to avoid conflict if Bootstrap has one */
+            flex-grow: 1; /* Allows this content to take up available space */
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align items to the top */
+            gap: 30px; /* Space between the two main divs */
+            padding: 20px; /* Padding inside this container */
+            width: 100%; /* Ensure it takes full width */
+            max-width: 1200px; /* Max width for readability */
+            margin: 0 auto; /* Center the container itself */
+        }
+
+        .receipt-display, .receipt-form {
+            flex: 1; /* Allows both divs to grow and shrink, taking equal space */
+            min-width: 300px; /* Minimum width before wrapping */
+            max-width: 550px; /* Max width for individual columns */
+            border: 1px solid #eee;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box; /* Include padding and border in the element's total width */
+        }
+
+        .receipt-display h3, .receipt-form h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .receipt-display img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: block; /* Ensures image does not have extra space below it */
+            margin: 0 auto; /* Center image within its div */
+        }
+
+        /* Form specific styles, leveraging Bootstrap classes where possible */
+        .receipt-form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        .receipt-form .form-control { /* Applying Bootstrap's form-control style */
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da; /* Bootstrap default input border */
+            border-radius: 5px; /* Bootstrap default border-radius */
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        /* Override Bootstrap's specific input types if needed, but form-control usually covers it */
+        .receipt-form input[type="text"],
+        .receipt-form input[type="number"],
+        .receipt-form input[type="date"] {
+            /* These specific selectors ensure custom padding/margin if form-control is insufficient */
+            margin-bottom: 20px; /* More space between fields */
+        }
+
+
+        .receipt-form .btn { /* Applying Bootstrap's button style */
+            background-color: #28a745; /* Green for Save/Confirm */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Full width button */
+            margin-top: 10px; /* Space above button */
+        }
+
+        .receipt-form .btn:hover {
+            background-color: #218838;
+        }
+
+        /* Style for the Cancel/Back button */
+        .receipt-form .btn-secondary-custom { /* Custom class to differentiate from Bootstrap's .btn-secondary if needed */
+            background-color: #6c757d; /* Grey for Cancel */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .receipt-form .btn-secondary-custom:hover {
+            background-color: #5a6268;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .confirmation-container {
+                flex-direction: column; /* Stack items vertically on small screens */
+                align-items: center; /* Center them when stacked */
+            }
+            .receipt-display, .receipt-form {
+                max-width: 100%; /* Take full width on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-custom">
+        <a href="{{ url_for('upload_file') }}"><button>Upload Receipt</button></a>
+        <a href="{{ url_for('receipts') }}"><button>View Receipts</button></a>
+        <a href="{{ url_for('dashboard') }}"><button>Dashboard</button></a>
+    </div>
+
+    <div class="confirmation-container">
+        <div class="receipt-display">
+            <h3>Uploaded Receipt</h3>
+            <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Receipt Image">
+        </div>
+
+        <div class="receipt-form">
+            <h2>Confirm or Edit Receipt Data</h2>
+            <form method="POST" action="{{ url_for('confirm_data') }}">
+                <input type="hidden" name="filename" value="{{ filename }}">
+
+                <div class="mb-3"> <label for="vendor" class="form-label">Vendor:</label>
+                    <input type="text" id="vendor" name="vendor" class="form-control" value="{{ receipt.vendor }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <input type="number" step="0.01" id="amount" name="amount" class="form-control" value="{{ receipt.amount }}">
+                </div>
+
+                <div class="mb-4"> <label for="date" class="form-label">Date (YYYY-MM-DD):</label>
+                    <input type="text" id="date" name="date" class="form-control" value="{{ receipt.date }}">
+                </div>
+
+                <button type="submit" class="btn btn-success">Save Data</button>
+                <a href="{{ url_for('upload_file') }}" class="btn btn-secondary-custom">Cancel / Upload New</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
