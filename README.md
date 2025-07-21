@@ -33,19 +33,19 @@ A simple web application built with **Flask** that extracts key information (ven
 ## 📸 Screenshots
 
 ### 1. Upload Page
-![Upload Receipt](screenshots/upload.png)
+![Upload Receipt](screenshots/Upload.png)
 
 ### 2. Receipt Confirmation Page
-![Confirm Data](screenshots/confirm_data.png)
+![Confirm Data](screenshots/Confirm_data.png)
 
 ### 3. Receipt Dashboard
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/Dashboard.png)
 
 ### 3. Edit Receipt
-![Dashboard](screenshots/edit.png)
+![Dashboard](screenshots/Edit.png)
 
 ### 3. Veiw Receipts
-![Dashboard](screenshots/receipts.png)
+![Dashboard](screenshots/Receipts.png)
 
 ---
 
